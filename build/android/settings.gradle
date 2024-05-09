@@ -23,3 +23,12 @@ rootProject.name = "IGL"
 include ':app'
 include ':app-openxr-vulkan'
 include ':app-openxr-gles'
+
+def enableGfxReconstruct = true
+if (settings.hasProperty('igl.enableGfxReconstruct')) {
+    enableGfxReconstruct = settings.getProperty('igl.enableGfxReconstruct').toBoolean()
+}
+if (enableGfxReconstruct) {
+    include ':VkLayer_gfxreconstruct'
+    project(':VkLayer_gfxreconstruct').projectDir = file('C:\\Users\\lunarg\\dev\\gfxreconstruct\\android\\layer')
+}
