@@ -23,3 +23,5 @@ rootProject.name = "IGL"
 include ':app'
 include ':app-openxr-vulkan'
 include ':app-openxr-gles'
+include ':VkLayer_gfxreconstruct'
+project(':VkLayer_gfxreconstruct').projectDir = file('C:\\Users\\lunarg\\dev\\gfxreconstruct\\android\\layer')
