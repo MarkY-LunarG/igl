@@ -106,7 +106,11 @@ void RunScreenshotTestsMode(igl::shell::ShellParams shellParams) {
   std::shared_ptr<IDevice> iglDev_;
   std::shared_ptr<ICommandQueue> cmdQueue_;
   createTestDeviceAndQueue(iglDev_, cmdQueue_);
+#if defined(IGL_PLATFORM_WIN) && IGL_PLATFORM_WIN
   auto glShellPlatform = std::make_shared<igl::shell::PlatformWin>(std::move(iglDev_));
+#elif defined(IGL_PLATFORM_LINUX) && IGL_PLATFORM_LINUX
+  auto glShellPlatform = std::make_shared<igl::shell::PlatformLinux>(std::move(iglDev_));
+#endif
 
   {
     std::unique_ptr<igl::shell::RenderSession> glSession;

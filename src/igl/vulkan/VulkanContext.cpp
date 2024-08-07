@@ -493,6 +493,9 @@ void VulkanContext::createInstance(const size_t numExtraExtensions, const char**
   auto instanceExtensions = extensions_.allEnabled(VulkanExtensions::ExtensionType::Instance);
 
   vkInstance_ = VK_NULL_HANDLE;
+  IGL_LOG_INFO("Enable Validation: %u\n", config_.enableValidation);
+  IGL_LOG_INFO("Enable GPU Assisted Validation: %u\n", config_.enableGPUAssistedValidation);
+  IGL_LOG_INFO("Enable Sync Validation: %u\n", config_.enableSynchronizationValidation);
   const VkResult creationErrorCode =
       (ivkCreateInstance(&vf_,
                          VK_API_VERSION_1_1,
@@ -504,7 +507,7 @@ void VulkanContext::createInstance(const size_t numExtraExtensions, const char**
                          &vkInstance_));
 
   IGL_ASSERT_MSG(creationErrorCode != VK_ERROR_LAYER_NOT_PRESENT,
-                 "ivkCreateInstance() failed. Did you forget to install the Vulkan SDK?");
+                 "ivkCreateInstance() failed. Did you forget to install the Vulkan SDK (Error 0x%08x)", creationErrorCode);
 
   VK_ASSERT(creationErrorCode);
 

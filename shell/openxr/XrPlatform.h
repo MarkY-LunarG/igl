@@ -35,5 +35,10 @@
 #include <windows.h>
 #endif // IGL_PLATFORM_WIN
 
+#if IGL_PLATFORM_LINUX
+#include <xcb/xcb.h>
+#include <xcb/glx.h>
+#endif // IGL_PLATFORM_LINUX
+
 #include <openxr/openxr.h>
 #include <openxr/openxr_platform.h>

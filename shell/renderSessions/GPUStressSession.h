@@ -18,6 +18,8 @@
 #include <igl/IGL.h>
 #include <shell/shared/platform/Platform.h>
 
+#include <atomic>
+
 namespace igl::shell {
 
 struct VertexFormat {

@@ -21,7 +21,11 @@
 #include <igl/vulkan/HWDevice.h>
 #include <igl/vulkan/VulkanContext.h>
 #include <memory>
+#if defined(IGL_PLATFORM_WIN) && IGL_PLATFORM_WIN
 #include <shell/shared/platform/win/PlatformWin.h>
+#elif defined(IGL_PLATFORM_LINUX) && IGL_PLATFORM_LINUX
+#include <shell/shared/platform/linux/PlatformLinux.h>
+#endif
 #include <shell/shared/renderSession/AppParams.h>
 #include <shell/shared/renderSession/DefaultSession.h>
 #include <shell/shared/renderSession/ShellParams.h>
@@ -139,20 +143,15 @@ GLFWwindow* initWindow() {
   return windowHandle;
 }
 
+#if defined(IGL_PLATFORM_WIN) && IGL_PLATFORM_WIN
+
 std::shared_ptr<igl::shell::PlatformWin> createPlatform(GLFWwindow* window) {
   igl::vulkan::VulkanContextConfig cfg = igl::vulkan::VulkanContextConfig();
 #if defined(_MSC_VER) && !IGL_DEBUG
   cfg.enableValidation = false;
 #endif
   auto ctx = vulkan::HWDevice::createContext(cfg,
-#if defined(_WIN32)
                                              (void*)glfwGetWin32Window(window)
-#else
-                                             (void*)glfwGetX11Window(window),
-                                             0,
-                                             nullptr,
-                                             (void*)glfwGetX11Display()
-#endif
   );
 
   // Prioritize discrete GPUs. If not found, use any that is available.
@@ -171,6 +170,35 @@ std::shared_ptr<igl::shell::PlatformWin> createPlatform(GLFWwindow* window) {
 
   return std::make_shared<igl::shell::PlatformWin>(std::move(vulkanDevice));
 }
+
+#elif defined(IGL_PLATFORM_LINUX) && IGL_PLATFORM_LINUX
+
+std::shared_ptr<igl::shell::PlatformLinux> createPlatform(GLFWwindow* window) {
+  igl::vulkan::VulkanContextConfig cfg = igl::vulkan::VulkanContextConfig();
+  auto ctx = vulkan::HWDevice::createContext(cfg,
+                                             (void*)glfwGetX11Window(window),
+                                             0,
+                                             nullptr,
+                                             (void*)glfwGetX11Display()
+  );
+
+  // Prioritize discrete GPUs. If not found, use any that is available.
+  std::vector<HWDeviceDesc> devices = vulkan::HWDevice::queryDevices(
+      *ctx.get(), HWDeviceQueryDesc(HWDeviceType::DiscreteGpu), nullptr);
+  if (devices.empty()) {
+    devices = vulkan::HWDevice::queryDevices(
+        *ctx.get(), HWDeviceQueryDesc(HWDeviceType::Unknown), nullptr);
+  }
+  IGL_ASSERT_MSG(devices.size() > 0, "Could not find Vulkan device with requested capabilities");
+
+  auto vulkanDevice = vulkan::HWDevice::create(std::move(ctx),
+                                               devices[0],
+                                               (uint32_t)shellParams_.viewportSize.x,
+                                               (uint32_t)shellParams_.viewportSize.y);
+
+  return std::make_shared<igl::shell::PlatformLinux>(std::move(vulkanDevice));
+}
+#endif
 
 igl::SurfaceTextures getVulkanSurfaceTextures(igl::IDevice& device) {
   IGL_PROFILER_FUNCTION();

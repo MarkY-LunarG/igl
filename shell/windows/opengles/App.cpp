@@ -18,7 +18,11 @@
 #include <igl/opengl/egl/PlatformDevice.h>
 #endif // IGL_ANGLE
 #include <memory>
+#if defined(IGL_PLATFORM_WIN) && IGL_PLATFORM_WIN
 #include <shell/shared/platform/win/PlatformWin.h>
+#elif defined(IGL_PLATFORM_LINUX) && IGL_PLATFORM_LINUX
+#include <shell/shared/platform/linux/PlatformLinux.h>
+#endif
 #include <shell/shared/renderSession/AppParams.h>
 #include <shell/shared/renderSession/DefaultSession.h>
 #include <shell/shared/renderSession/ShellParams.h>
@@ -186,7 +190,11 @@ int main(int argc, char* argv[]) {
                                                     glfwGetEGLSurface(glesWindow.get()),
                                                     glfwGetEGLSurface(glesWindow.get())));
 
+#if defined(IGL_PLATFORM_WIN) && IGL_PLATFORM_WIN
   glesShellPlatform_ = std::make_shared<igl::shell::PlatformWin>(std::move(glesDevice));
+#elif defined(IGL_PLATFORM_LINUX) && IGL_PLATFORM_LINUX
+  glesShellPlatform_ = std::make_shared<igl::shell::PlatformLinux>(std::move(glesDevice));
+#endif
 #endif // IGL_ANGLE
   IGL_ASSERT(glesShellPlatform_);
 

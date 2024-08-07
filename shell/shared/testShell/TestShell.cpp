@@ -10,9 +10,15 @@
 #include <memory>
 #include <shell/shared/imageLoader/ImageLoader.h>
 #include <shell/shared/platform/android/PlatformAndroid.h>
-#include <shell/shared/platform/ios/PlatformIos.h>
-#include <shell/shared/platform/mac/PlatformMac.h>
+#if defined(IGL_PLATFORM_WIN) && IGL_PLATFORM_WIN
 #include <shell/shared/platform/win/PlatformWin.h>
+#elif defined(IGL_PLATFORM_LINUX) && IGL_PLATFORM_LINUX
+#include <shell/shared/platform/linux/PlatformLinux.h>
+#elif defined(IGL_PLATFORM_IOS) && IGL_PLATFORM_IOS
+#include <shell/shared/platform/ios/PlatformIos.h>
+#elif defined(IGL_PLATFORM_MACOS) && IGL_PLATFORM_MACOS
+#include <shell/shared/platform/mac/PlatformMac.h>
+#endif
 #include <shell/shared/renderSession/ShellParams.h>
 #include <shell/shared/testShell/TestShell.h>
 
@@ -41,6 +47,9 @@ void TestShellBase::SetUp(ScreenSize screenSize) {
   IGL_ASSERT(platform_);
 #elif defined(IGL_PLATFORM_WIN) && IGL_PLATFORM_WIN
   platform_ = std::make_shared<igl::shell::PlatformWin>(std::move(iglDevice));
+  IGL_ASSERT(platform_);
+#elif defined(IGL_PLATFORM_LINUX) && IGL_PLATFORM_LINUX
+  platform_ = std::make_shared<igl::shell::PlatformLinux>(std::move(iglDevice));
   IGL_ASSERT(platform_);
 #elif defined(IGL_PLATFORM_ANDROID) && IGL_PLATFORM_ANDROID
   platform_ =

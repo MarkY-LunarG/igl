@@ -31,6 +31,9 @@
 #if IGL_PLATFORM_WIN
 #include <shell/shared/platform/win/PlatformWin.h>
 #endif
+#if IGL_PLATFORM_LINUX
+#include <shell/shared/platform/linux/PlatformLinux.h>
+#endif
 
 #include <shell/shared/input/IntentListener.h>
 #include <shell/shared/renderSession/AppParams.h>
@@ -557,6 +560,8 @@ void XrApp::createShellSession(std::unique_ptr<igl::IDevice> device, AAssetManag
   platform_ = std::make_shared<igl::shell::PlatformMac>(std::move(device));
 #elif IGL_PLATFORM_WIN
   platform_ = std::make_shared<igl::shell::PlatformWin>(std::move(device));
+#elif IGL_PLATFORM_LINUX
+  platform_ = std::make_shared<igl::shell::PlatformLinux>(std::move(device));
 #endif
 
   renderSession_ = igl::shell::createDefaultRenderSession(platform_);

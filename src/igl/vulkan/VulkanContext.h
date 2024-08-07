@@ -88,8 +88,8 @@ struct VulkanContextConfig {
 
   bool enableConcurrentVkDevicesSupport = false;
 
-  bool enableValidation = true;
-  bool enableGPUAssistedValidation = true;
+  bool enableValidation = false; // true;
+  bool enableGPUAssistedValidation = false; // true;
   bool enableSynchronizationValidation = false;
   bool enableBufferDeviceAddress = false;
   bool enableExtraLogs = true;

@@ -10,12 +10,22 @@ set(PROJECT_NAME "Desktop")
 add_definitions("-DNOMINMAX")
 add_definitions("-D_USE_MATH_DEFINES=1")
 
-file(GLOB PLATFORM_SHARED_SRC_FILES LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-     ../shared/fileLoader/win/*.cpp ../shared/imageWriter/win/*.cpp
-     ../shared/imageWriter/stb/*.cpp ../shared/platform/win/*.cpp)
-file(GLOB PLATFORM_SHARED_HEADER_FILES LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-     ../shared/fileLoader/win/*.h ../shared/imageWriter/win/*.h ../shared/imageWriter/stb/*.h
-     ../shared/platform/win/*.h)
+
+if (WIN32)
+  file(GLOB PLATFORM_SHARED_SRC_FILES LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+      ../shared/fileLoader/win/*.cpp ../shared/imageWriter/win/*.cpp
+      ../shared/imageWriter/stb/*.cpp ../shared/platform/win/*.cpp)
+  file(GLOB PLATFORM_SHARED_HEADER_FILES LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+      ../shared/fileLoader/win/*.h ../shared/imageWriter/win/*.h ../shared/imageWriter/stb/*.h
+      ../shared/platform/win/*.h)
+else()
+  file(GLOB PLATFORM_SHARED_SRC_FILES LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+      ../shared/fileLoader/linux/*.cpp ../shared/imageWriter/win/*.cpp
+      ../shared/imageWriter/stb/*.cpp ../shared/platform/linux/*.cpp)
+  file(GLOB PLATFORM_SHARED_HEADER_FILES LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+      ../shared/fileLoader/linux/*.h ../shared/imageWriter/win/*.h ../shared/imageWriter/stb/*.h
+      ../shared/platform/linux/*.h)
+endif()
 
 add_library(IGLShellPlatform ${PLATFORM_SHARED_SRC_FILES} ${PLATFORM_SHARED_HEADER_FILES})
 target_link_libraries(IGLShellPlatform PUBLIC IGLLibrary)
@@ -59,8 +69,12 @@ function(ADD_SHELL_SESSION_BACKEND_OPENXR_SIM targetApp backend srcs libs compil
   igl_set_cxxstd(${target} 20)
   target_compile_definitions(${target} PRIVATE "IGL_SHELL_SESSION=${targetApp}" ${compileDefs})
   target_include_directories(${target} PRIVATE "${IGL_ROOT_DIR}/third-party/deps/src/openxr-sdk/src/common")
-  target_link_libraries(${target} PUBLIC IGLShellOpenXR_sim_${backend} IGLShellShared IGLShellPlatform Shcore.lib ${libs})
-endfunction()
+  target_link_libraries(${target} PUBLIC IGLShellOpenXR_sim_${backend} IGLShellShared IGLShellPlatform)
+  if(WIN32)
+    target_link_libraries(${target} PUBLIC IGLShellOpenXR_sim_${backend} Shcore.lib)
+  endif()
+  target_link_libraries(${target} PUBLIC IGLShellOpenXR_sim_${backend} ${libs})
+  endfunction()
 
 macro(ADD_SHELL_SESSION_WITH_SRCS target srcs libs)
   if(IGL_WITH_VULKAN)

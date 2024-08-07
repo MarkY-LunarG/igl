@@ -35,7 +35,10 @@
 #include <igl/opengl/Version.h>
 #include <igl/opengl/ViewTextureTarget.h>
 #include <memory>
+#if defined(IGL_PLATFORM_WIN) && IGL_PLATFORM_WIN
 #include <shell/shared/platform/win/PlatformWin.h>
+#elif defined(IGL_PLATFORM_LINUX) && IGL_PLATFORM_LINUX
+#endif
 #include <shell/shared/renderSession/AppParams.h>
 #include <shell/shared/renderSession/DefaultSession.h>
 #include <shell/shared/renderSession/ShellParams.h>
@@ -194,13 +197,13 @@ static void RunApplicationMode(uint32_t majorVersion, uint32_t minorVersion) {
   if (!glWindow.get())
     return;
 
-#if defined(_WIN32)
+#if defined(IGL_PLATFORM_WIN) && IGL_PLATFORM_WIN
   auto context = std::make_unique<igl::opengl::wgl::Context>(
       GetDC(glfwGetWin32Window(glWindow.get())), glfwGetWGLContext(glWindow.get()));
   auto glDevice = std::make_unique<shell::util::WGLDevice>(std::move(context));
 
   glShellPlatform_ = std::make_shared<igl::shell::PlatformWin>(std::move(glDevice));
-#elif IGL_PLATFORM_LINUX
+#elif defined(IGL_PLATFORM_LINUX) && IGL_PLATFORM_LINUX
   auto context = std::make_unique<igl::opengl::glx::Context>(
       nullptr,
       glfwGetX11Display(),
@@ -209,7 +212,7 @@ static void RunApplicationMode(uint32_t majorVersion, uint32_t minorVersion) {
 
   auto glDevice = std::make_unique<igl::opengl::glx::Device>(std::move(context));
 
-  glShellPlatform_ = std::make_shared<igl::shell::PlatformWin>(std::move(glDevice));
+  glShellPlatform_ = std::make_shared<igl::shell::PlatformLinux>(std::move(glDevice));
 #endif
   {
     std::unique_ptr<igl::shell::RenderSession> glSession_;
